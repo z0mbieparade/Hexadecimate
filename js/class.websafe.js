@@ -350,8 +350,6 @@ class Websafe
       }
     }).splice(0, this.options.max_colors ? this.options.max_colors : colors.length);
 
-    console.log(this.colors);
-
     _this.generate_html(gen_image_callback);
   }
 
@@ -564,7 +562,7 @@ class Websafe
 
     if(this.options.masonry && this.options.cols > 0)
     {
-      console.log('generate_html masonry cols > 0', this.options);
+      //console.log('generate_html masonry cols > 0', this.options);
 
       let cols_html = [];
       let col_longest_text = [];
@@ -639,12 +637,10 @@ class Websafe
     }
     else if(this.options.masonry && this.options.cols < 1)
     {
-      console.log('generate_html masonry 0 cols', this.options);
+      //console.log('generate_html masonry 0 cols', this.options);
 
       this.colors.forEach(function(c)
       {
-        if(!c.name) console.log(c);
-
         let col = '#' + c.hex;
         if(_this.options.labels === 'names' || _this.options.labels === 'sherwin_ai'){
           col = c.name ? c.name : '#' + c.hex;
@@ -775,7 +771,7 @@ class Websafe
             margin_top = shortest - p.top;
             new_top = p.top + margin_top;
 
-            console.log(txt, 'left', x_left, 'right', x_right, 'short', shortest, 'tall', tallest);
+            //console.log(txt, 'left', x_left, 'right', x_right, 'short', shortest, 'tall', tallest);
           }
 
           if(!options.total_width && padding_top > $color[0].clientWidth)
@@ -903,7 +899,7 @@ class Websafe
 
               if(current.resize)
               {
-                console.log('RESIZE', current)
+                //console.log('RESIZE', current)
                 let txt_len = current.txt.length + (next ? next.txt.length : 0);
                 let new_width_perc = current.txt.length / txt_len;
                 let new_width = Math.floor(current.width * new_width_perc);
@@ -932,8 +928,6 @@ class Websafe
               }
             }
 
-            console.log(current.txt, current);
-
             for(let x = current.left; x < current.left + current.width; x++)
             {
               col_p[x] = col_p[x] || 0;
@@ -949,7 +943,7 @@ class Websafe
     }
     else
     {
-      console.log('generate_html', this.options);
+      //console.log('generate_html', this.options);
 
       let open_row = false;
       this.colors.forEach(function(c){
@@ -1269,7 +1263,7 @@ class Websafe
 
     if(options.masonry && options.cols < 1)
     {
-      console.log('generate_image: masonry 0 cols', options);
+      //console.log('generate_image: masonry 0 cols', options);
 
       let $colors = $('#sizer span.color');
       for(let i = $colors.length - 1; i >= 0; i--) //loop backwards, because that's how layers are ordered
@@ -1350,7 +1344,7 @@ class Websafe
     }
     else
     {
-      console.log('generate_image', options);
+      //console.log('generate_image', options);
 
       $('#sizer span.color').each(function(i, elem)
       {
