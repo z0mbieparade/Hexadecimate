@@ -1,0 +1,528 @@
+//_base.scss
+//borrowed from https://codepen.io/jakob-e/pen/doMoML
+@function svg-url($svg){
+    @if not str-index($svg,xmlns) {
+        $svg: str-replace($svg, '<svg','<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+
+    $encoded:'';
+    $slice: 2000;
+    $index: 0;
+    $loops: ceil(str-length($svg)/$slice);
+
+    @for $i from 1 through $loops {
+        $chunk: str-slice($svg, $index, $index + $slice - 1);
+        //
+        //   Encode
+        //
+        $chunk: str-replace($chunk,'"', '\'');
+        $chunk: str-replace($chunk,'%', '%25');
+        $chunk: str-replace($chunk,'&', '%26');
+        $chunk: str-replace($chunk,'#', '%23');
+        $chunk: str-replace($chunk,'{', '%7B');
+        $chunk: str-replace($chunk,'}', '%7D');
+        $chunk: str-replace($chunk,'<', '%3C');
+        $chunk: str-replace($chunk,'>', '%3E');
+
+        //
+        //    The maybe list
+        //
+        //    Keep size and compile time down
+        //    ... only add on documented fail
+        //
+        //  $chunk: str-replace($chunk, '|', '%7C');
+        //  $chunk: str-replace($chunk, '[', '%5B');
+        //  $chunk: str-replace($chunk, ']', '%5D');
+        //  $chunk: str-replace($chunk, '^', '%5E');
+        //  $chunk: str-replace($chunk, '`', '%60');
+        //  $chunk: str-replace($chunk, ';', '%3B');
+        //  $chunk: str-replace($chunk, '?', '%3F');
+        //  $chunk: str-replace($chunk, ':', '%3A');
+        //  $chunk: str-replace($chunk, '@', '%40');
+        //  $chunk: str-replace($chunk, '=', '%3D');
+
+        $encoded: #{$encoded}#{$chunk};
+        $index: $index + $slice;
+    }
+    @return url("data:image/svg+xml,#{$encoded}");
+}
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+    @return if($index,
+        str-slice($string, 1, $index - 1) + $replace +
+        str-replace(str-slice($string, $index +
+        str-length($search)), $search, $replace),
+        $string);
+}
+
+@font-face {
+	font-family: 'Menlo Regular';
+	font-style: normal;
+	font-weight: normal;
+	src: local('Menlo Regular'), url('Menlo-Regular.woff') format('woff');
+}
+
+$white: 		white !default;
+$black: 		black !default;
+$navy: 			navy !default;
+$green: 		green !default;
+$red: 			red !default;
+$brown: 		brown !default;
+$purple: 		purple !default;
+$orange: 		orange !default;
+$yellow: 		yellow !default;
+$lime: 			lime !default;
+$teal: 			teal !default;
+$cyan: 			#009fff !default;
+$blue: 			blue !default;
+$fuchsia: 	fuchsia !default;
+$gray: 			gray !default;
+$lightgray: lightgray !default;
+
+:root {
+	--color-white: #{$white};
+	--color-black: #{$black};
+	--color-navy: #{$navy};
+	--color-green: #{$green};
+	--color-red: #{$red};
+	--color-brown: #{$brown};
+	--color-purple: #{$purple};
+	--color-orange: #{$orange};
+	--color-yellow: #{$yellow};
+	--color-lime: #{$lime};
+	--color-teal: #{$teal};
+	--color-cyan: #{$cyan};
+	--color-blue: #{$blue};
+	--color-fuchsia: #{$fuchsia};
+	--color-gray: #{$gray};
+	--color-lightgray: #{$lightgray};
+}
+
+$background: 					var(--color-black) !default;
+$default-font-color: 	var(--color-lightgray) !default;
+$font-size: 					16px !default;
+$label-color: 				var(--color-lightgray) !default;
+
+$input-resting:         var(--color-purple) !default;
+$input-border-resting: 	1px solid $input-resting !default;
+$input-text-resting: 		var(--color-fuchsia) !default;
+$input-border-hover: 		1px solid var(--color-fuchsia) !default;
+$input-border-focus: 		1px solid var(--color-orange) !default;
+$input-selected: 				var(--color-orange);
+$input-selected-svg:    $orange;
+
+$button-bkg-color: 			var(--color-orange) !default;
+$button-border-color: 	1px solid var(--color-orange) !default;
+$button-color: 					var(--color-black) !default;
+
+$button-border-hover: 	1px solid var(--color-yellow) !default;
+$button-bkg-active:			var(--color-yellow) !default;
+$button-border-active: 	1px solid var(--color-yellow) !default;
+$button-border-focus:		1px solid var(--color-white) !default;
+
+@mixin switch($width:56px, $on:'on', $off:'off')
+{
+  width: $width;
+  height: 22px;
+  margin: 1px 3px;
+
+  .slider
+  {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: $input-border-resting;
+    margin-left: auto;
+    background-color: transparent;
+    box-shadow: none;
+
+    &:before
+    {
+      height: 15px;
+      width: 15px;
+      left: 4px;
+      bottom: 3px;
+      background-color: $input-resting;
+      box-shadow: none;
+    }
+
+    &:after
+    {
+      content: $off;
+      position: absolute;
+      color: $input-text-resting;
+      right: 8px;
+      bottom: 2px;
+    }
+  }
+
+  input:checked + .slider
+  {
+    border: 1px solid $input-selected;
+    background-color: transparent;
+
+    &:before
+    {
+      background-color: $input-selected;
+      color: $input-selected;
+      height: 13px;
+      width: 13px;
+      left: 4px;
+      bottom: 4px;
+    }
+
+    &:after {
+      content: $on;
+      left: 5px;
+    }
+  }
+
+  //35px
+  input:checked + .slider:before {
+    -webkit-transform: translateX(#{$width - 21px});
+    -ms-transform: translateX(#{$width - 21px});
+    transform: translateX(#{$width - 21px});
+  }
+}
+
+html
+{
+	font-size: $font-size;
+
+	*
+	{
+		font-family: 'Menlo Regular', monospace;
+		font-size: 1rem;
+		line-height: 1rem;
+	}
+
+	.fa-icon:before
+	{
+		font-family: 'FontAwesome';
+	}
+}
+
+body {
+	background-color: $background;
+	color: $default-font-color;
+
+	a
+	{
+		color: inherit;
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	.link
+	{
+		text-align: center;
+
+		> .hover
+		{
+			visibility: hidden;
+		}
+
+		&:hover > .hover
+		{
+			visibility: visible;
+		}
+	}
+
+	input
+	{
+		border: $input-border-resting;
+		background: transparent;
+		color: $input-text-resting;
+		font-size: 1rem;
+		padding: .5rem;
+
+		&:hover {
+			border: $input-border-hover;
+		}
+
+		&:focus {
+			outline: none;
+			border: $input-border-focus;
+		}
+	}
+
+	input[type="checkbox"]
+	{
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+
+		width: 1rem;
+		height: 1rem;
+		vertical-align: middle;
+		cursor: pointer;
+
+		border-radius: 0;
+		outline: 0 !important;
+		position: relative;
+
+		&:checked
+		{
+			outline: 0;
+
+			&:before
+			{
+				content: '';
+				display: block;
+				position: absolute;
+				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" viewBox="0 0 14 10"><defs><style>.check { fill:#{$input-selected-svg}; fill-rule: evenodd; }</style></defs><path class="check" d="M309.707,184.766h0L302.04,192.7h0a0.976,0.976,0,0,1-1.414,0h0l-4.333-4.483h0a1.049,1.049,0,0,1-.293-0.731,1.018,1.018,0,0,1,1-1.035,0.981,0.981,0,0,1,.707.3h0l3.626,3.752,6.96-7.2h0A0.981,0.981,0,0,1,309,183a1.018,1.018,0,0,1,1,1.035A1.049,1.049,0,0,1,309.707,184.766Z" transform="translate(-296 -183)"/></svg>');
+				width: calc(100% - 4px);
+				height: calc(100% - 4px);
+				background-repeat: no-repeat;
+				background-size: contain;
+				background-position: center;
+				left: 2px;
+				top: 2px;
+			}
+		}
+	}
+
+  select {
+	  -webkit-appearance: none;
+	  appearance: none;
+	  color: $input-text-resting;
+	  border: $input-border-resting;
+	  outline: 0;
+	  padding: .5rem 2rem 0.5rem 0.5rem;
+	  border-radius: 0;
+	  background-color: $input-border-resting;
+	  background-image: linear-gradient($background, $background),
+	    linear-gradient(-135deg, transparent 50%, $background 50%),
+	    linear-gradient(-225deg, transparent 50%, $background 50%),
+	    linear-gradient($background 42%, $input-text-resting 42%);
+	  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+	  background-size: 1px 100%, 20px 22px, 20px 22px, 20px 100%;
+	  background-position: right 20px center, right bottom, right bottom, right bottom;
+
+		&:hover {
+			border: $input-border-hover;
+		  background-image: linear-gradient($background, $background),
+		    linear-gradient(-135deg, transparent 50%, $background 50%),
+		    linear-gradient(-225deg, transparent 50%, $background 50%),
+		    linear-gradient(var(--color-black) 42%, $input-selected 42%);
+			cursor: pointer;
+		}
+	}
+
+	button
+	{
+		border: $button-border-color;
+		background: $button-bkg-color;
+		color: $button-color;
+		font-size: 1rem;
+		padding: .5rem;
+
+		&:hover {
+			border: $button-border-hover;
+		}
+
+		&:active {
+			outline: none;
+			background: $button-bkg-active;
+			border: $button-border-active;
+		}
+
+		&:focus {
+			outline: none;
+			border: $button-border-focus;
+		}
+	}
+
+	label {
+		color: $label-color;
+		font-size: 1rem;
+		line-height: 1rem;
+	}
+
+  .switch
+	{
+		position: relative;
+		display: inline-block;
+		width: 30px;
+		height: 16px;
+		margin: 6px 10px 0 3px;
+
+		input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.slider
+		{
+		  position: absolute;
+		  cursor: pointer;
+		  top: 3px;
+		  left: 0;
+		  right: 0;
+		  bottom: 3px;
+			border: none;
+		  -webkit-transition: .4s;
+		  transition: .4s;
+			border-radius: 34px;
+			margin-left: auto;
+			background-color: rgba(255,255,255,.3);
+			box-shadow: inset 0px 0px 2px rgba(255,255,255,.7);
+
+			&:before
+			{
+				position: absolute;
+				content: "";
+				height: 15px;
+				width: 15px;
+				left: -1px;
+				bottom: -2px;
+				-webkit-transition: .4s;
+				transition: .4s;
+				border-radius: 50%;
+				background-color: var(--color-lightgray);
+				box-shadow: 0px 0px 4px rgba(0,0,0,.7), inset 0px 0px 2px rgba(255, 255, 255, 0.7);
+			}
+		}
+
+		input:checked + .slider
+		{
+			background-color: rgba(204,0,255,.4);
+
+			&:before
+			{
+				background-color: var(--highlight-color);
+			}
+		}
+
+		input:checked + .slider:before {
+		  -webkit-transform: translateX(17px);
+		  -ms-transform: translateX(17px);
+		  transform: translateX(17px);
+		}
+
+		input[disabled] + .slider {
+			opacity: .3;
+			cursor: default;
+
+			&:before
+			{
+				cursor: default;
+			}
+		}
+	}
+
+	/*.switch.inside_label
+	{
+    @include switch(56px, 'on', 'off');
+	}
+
+  <label id="on_off_switch" class="switch inside_label">
+    <input type="checkbox" id="on_off">
+    <span class="slider"></span>
+  </label>
+  */
+}
+
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 812px)
+  and (-webkit-min-device-pixel-ratio: 3)
+	and (orientation: portrait)
+{
+	html
+	{
+		font-size: 31px;
+		min-height: calc(31px * 21);
+		min-width: calc(31px * 29);
+		//border: 1px solid #F00;
+
+		pre.rainbow-show,
+	  pre.rainbow-show code,
+	  pre.rainbow-show span
+		{
+			font-size: 16px !important;
+	    line-height: 18px;
+		}
+
+	  pre.rainbow-show
+		{
+			background-size: 100% 58px;
+		}
+	}
+}
+
+@media only screen
+  and (min-device-width: 375px)
+  and (max-device-width: 812px)
+  and (-webkit-min-device-pixel-ratio: 3)
+	and (orientation: landscape)
+{
+		html
+		{
+			font-size: 19px;
+			min-height: calc(19px * 21);
+			min-width: calc(19px * 29);
+			//border: 1px solid #F00;
+
+			pre.rainbow-show,
+		  pre.rainbow-show code,
+		  pre.rainbow-show span
+			{
+				font-size: 10px !important;
+		    line-height: 12px;
+			}
+
+		  pre.rainbow-show
+			{
+				background-size: 100% 40px;
+			}
+		}
+}
+
+$col_arr: (
+	"00": "white",
+	"01": "black",
+	"02": "navy",
+	"03": "green",
+	"04": "red",
+	"05": "brown",
+	"06": "purple",
+	"07": "orange",
+	"08": "yellow",
+	"09": "lime",
+	"10": "teal",
+	"11": "cyan",
+	"12": "blue",
+	"13": "fuchsia",
+	"14": "gray",
+	"15": "lightgray");
+
+@each $n, $col in $col_arr {
+  .bg#{$n} { background: var(--color-#{$col}) }
+	.fg#{$n} { color: var(--color-#{$col}) }
+	.bc#{$n} { border-color: var(--color-#{$col}) }
+	.all#{$n}, .all#{$n} > * {
+		border-color: var(--color-#{$col});
+		color: var(--color-#{$col});
+		background: var(--color-#{$col});
+	}
+
+	.h1c#{$n} h1 { color: var(--color-#{$col}) }
+	.h2c#{$n} h2 { color: var(--color-#{$col}) }
+	.h3c#{$n} h3 { color: var(--color-#{$col}) }
+	.ac#{$n} a { color: var(--color-#{$col}) }
+	.sc#{$n} strong { color: var(--color-#{$col}) }
+}
+
+.u { text-decoration: underline; }
+.b, strong { font-weight: bold; }
+.i { font-style: italic; }
+.r {
+	color: initial;
+	background-color: initial;
+	font-weight: normal;
+	font-style: initial;
+	text-decoration: none;
+}

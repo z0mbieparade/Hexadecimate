@@ -1,0 +1,152 @@
+@import '_base.scss';
+
+@font-face {
+    font-family: 'November';
+    src:url('November.ttf.woff') format('woff'),
+        url('November.ttf.svg#November') format('svg'),
+        url('November.ttf.eot'),
+        url('November.ttf.eot?#iefix') format('embedded-opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+  margin: 0;
+  padding: .5rem;
+
+  label
+  {
+    white-space: nowrap;
+  }
+
+	#settings, #preview_canvas {
+		margin-bottom: 1rem;
+	}
+
+  #title
+  {
+    font-family: 'November', monospace !important;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+
+    * {
+      font-family: 'November', monospace !important;
+      font-size: 1.5rem;
+      line-height: 1.5rem;
+    }
+  }
+
+	#sizer {
+		font-family: 'November', monospace !important;
+		text-transform: uppercase;
+		background: #000;
+
+		width: max-content;
+		position: relative;
+
+		.row {
+			width: max-content;
+			font-size: inherit;
+			line-height: inherit;
+			font-family: inherit;
+		}
+
+		.color {
+			display: inline-block;
+			text-align: center;
+			font-size: inherit;
+			line-height: inherit;
+			font-family: inherit;
+
+			.debug {
+				background-color: #FFF;
+				color: #000;
+				font-size: 13px;
+			}
+		}
+
+		&.masonry:not(.no_cols)
+		{
+			display: flex;
+			flex-direction: row;
+			width: 100%;
+
+			.col
+			{
+				font-family: inherit;
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: column;
+
+				.color
+				{
+					flex: 1 1 auto;
+				}
+			}
+		}
+
+		&.no_cols:not(.masonry)
+		{
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+
+			.color
+			{
+				display: flex;
+				flex: 1 1 auto;
+				justify-content: center;
+			}
+		}
+
+		&.no_cols.masonry
+		{
+			width: 100%;
+			z-index: 100;
+
+			.color
+			{
+				display: inline-block;
+				vertical-align: top;
+				position: relative;
+
+				.color_name
+				{
+					font-family: inherit;
+					font-size: inherit;
+					line-height: inherit;
+				}
+
+				.color_fill
+				{
+					font-family: inherit;
+					line-break: anywhere;
+					position: absolute;
+					top: 0;
+					overflow: hidden;
+					max-width: 100%;
+					opacity: .5;
+					display: none;
+				}
+			}
+		}
+
+		&.hide_sizer
+		{
+			visibility: hidden;
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+	}
+
+	.switch.inside_label
+	{
+    &#asc_desc_switch
+    {
+      @include switch(72px, 'asc', 'desc');
+    }
+	}
+}
