@@ -2,10 +2,10 @@
 
 @font-face {
     font-family: 'November';
-    src:url('November.ttf.woff') format('woff'),
-        url('November.ttf.svg#November') format('svg'),
-        url('November.ttf.eot'),
-        url('November.ttf.eot?#iefix') format('embedded-opentype');
+    src:url('November.woff') format('woff'),
+        url('November.svg#November') format('svg'),
+        url('November.eot'),
+        url('November.eot?#iefix') format('embedded-opentype');
     font-weight: normal;
     font-style: normal;
 }
@@ -14,14 +14,21 @@ body {
   margin: 0;
   padding: .5rem;
 
-  label
-  {
-    white-space: nowrap;
-  }
-
-	#settings, #preview_canvas {
+	#settings, #preview_canvas, #inputs {
 		margin-bottom: 1rem;
 	}
+
+  #settings #inputs
+  {
+    label {
+      display: inline-block;
+      padding: 2px;
+
+      input:not([type=checkbox]) {
+        width: 3rem;
+      }
+    }
+  }
 
   #title
   {
@@ -37,11 +44,26 @@ body {
     }
   }
 
+  #preview_canvas
+  {
+    display: flex;
+    border: 1px dashed var(--color-purple);
+    width: 100%;
+    overflow: hidden;
+
+    canvas
+    {
+      flex: 0 1 auto;
+      object-fit:contain;
+      object-position:top left;
+      max-width: 100%;
+    }
+  }
+
 	#sizer {
 		font-family: 'November', monospace !important;
 		text-transform: uppercase;
-		background: #000;
-
+    border: 1px dashed var(--color-purple);
 		width: max-content;
 		position: relative;
 

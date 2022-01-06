@@ -142,7 +142,7 @@ $button-border-focus:		1px solid var(--color-white) !default;
       height: 15px;
       width: 15px;
       left: 4px;
-      bottom: 3px;
+      bottom: 5px;
       background-color: $input-resting;
       box-shadow: none;
     }
@@ -153,7 +153,7 @@ $button-border-focus:		1px solid var(--color-white) !default;
       position: absolute;
       color: $input-text-resting;
       right: 8px;
-      bottom: 2px;
+      bottom: 4px;
     }
   }
 
@@ -237,14 +237,22 @@ body {
 		font-size: 1rem;
 		padding: .5rem;
 
-		&:hover {
-			border: $input-border-hover;
-		}
+    &:not([disabled])
+    {
+      &:hover {
+  			border: $input-border-hover;
+  		}
 
-		&:focus {
-			outline: none;
-			border: $input-border-focus;
-		}
+  		&:focus {
+  			outline: none;
+  			border: $input-border-focus;
+  		}
+    }
+
+    &[disabled]
+    {
+      opacity: .5;
+    }
 	}
 
 	input[type="checkbox"]
@@ -300,7 +308,8 @@ body {
 	  background-size: 1px 100%, 20px 22px, 20px 22px, 20px 100%;
 	  background-position: right 20px center, right bottom, right bottom, right bottom;
 
-		&:hover {
+		&:not([disabled]):hover
+    {
 			border: $input-border-hover;
 		  background-image: linear-gradient($background, $background),
 		    linear-gradient(-135deg, transparent 50%, $background 50%),
@@ -308,7 +317,31 @@ body {
 		    linear-gradient(var(--color-black) 42%, $input-selected 42%);
 			cursor: pointer;
 		}
+
+    &[disabled]
+    {
+      opacity: .5;
+    }
 	}
+
+  label
+  {
+    white-space: nowrap;
+    color: $label-color;
+		font-size: 1rem;
+		line-height: 1rem;
+
+    &[disabled]
+    {
+      opacity: .5;
+
+      & > input[disabled],
+      & > select[disabled]
+      {
+        opacity: 1;
+      }
+    }
+  }
 
 	button
 	{
@@ -318,26 +351,28 @@ body {
 		font-size: 1rem;
 		padding: .5rem;
 
-		&:hover {
-			border: $button-border-hover;
-		}
+    &:not([disabled])
+    {
+      &:hover {
+  			border: $button-border-hover;
+  		}
 
-		&:active {
-			outline: none;
-			background: $button-bkg-active;
-			border: $button-border-active;
-		}
+  		&:active {
+  			outline: none;
+  			background: $button-bkg-active;
+  			border: $button-border-active;
+  		}
 
-		&:focus {
-			outline: none;
-			border: $button-border-focus;
-		}
-	}
+  		&:focus {
+  			outline: none;
+  			border: $button-border-focus;
+  		}
+    }
 
-	label {
-		color: $label-color;
-		font-size: 1rem;
-		line-height: 1rem;
+    &[disabled]
+    {
+      opacity: .5;
+    }
 	}
 
   .switch

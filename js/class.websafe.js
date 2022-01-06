@@ -1,7 +1,5 @@
-
 class Websafe
 {
-
   constructor()
   {
     this.muck_char = {
@@ -13,6 +11,184 @@ class Websafe
       'B':'8',
       'O':'0'
     };
+
+    let max_canvas_sizes = {
+      Desktop: {
+        Chrome: {
+          "73+": {
+            width_height: 65535,
+            area: 268435456
+          },
+          "72-": {
+            width_height:32767,
+            area: 268435456
+          }
+        },
+        Edge:{
+          "80+": {
+            width_height: 65535,
+            area: 268435456
+          },
+          "13": {
+            width_height: 16384,
+            area: 268435456
+          }
+        },
+        Firefox: {
+          width_height: 32767,
+          area: 124992400
+        },
+        Safari: {
+          width: 4194303,
+          height: 8388607,
+          area: 268435456
+        },
+        other: {
+          width_height: 8192,
+          area: 67108864
+        }
+      },
+      iOS: {
+        width: 4194303,
+        height: 8388607,
+        area: 16777216
+      },
+      Android: {
+        68: {
+          5: {
+            width_height: 32767,
+            area: 130005604
+          },
+          6: {
+            width_height: 32767,
+            area: 117418896
+          },
+          "7+": {
+            width_height: 32767,
+            area: 201299344
+          }
+        },
+        91: {
+          5: {
+            width_height: 65535,
+            area: 124992400
+          },
+          6: {
+            width_height: 65535,
+            area: 268435456
+          },
+          7: {
+            width_height: 65535,
+            area: 201299344
+          },
+          "8+": {
+            width_height:65535,
+            area:268435456
+          }
+        },
+        other: {
+          width_height: 8192,
+          area: 67108864
+        }
+      },
+      other: {
+        width_height: 8192,
+        area: 67108864
+      }
+    }
+
+    var parser = new UAParser();
+    let ua_res = parser.getResult();
+    let is_mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    let canvas_size, version, browser;
+    let canvas_size_other = is_mobile ? max_canvas_sizes.other : max_canvas_sizes.Desktop.other;
+
+    if(!is_mobile && max_canvas_sizes.Desktop[ua_res.browser.name])
+    {
+      canvas_size = max_canvas_sizes.Desktop[ua_res.browser.name];
+      version = ua_res.browser.version ? ua_res.browser.version : ua_res.browser.major;
+      browser = ua_res.browser.name;
+    }
+    else if(max_canvas_sizes[ua_res.os.name])
+    {
+      canvas_size = max_canvas_sizes[ua_res.os.name];
+      version = ua_res.os.version ? ua_res.os.version : null;
+      browser = ua_res.os.name;
+      canvas_size_other = ua_res.os.name === 'Android' ? max_canvas_sizes.Android.other : canvas_size_other;
+    }
+    else if(!is_mobile)
+    {
+      canvas_size = max_canvas_sizes.Desktop.other;
+    }
+    else
+    {
+      canvas_size = max_canvas_sizes.other;
+    }
+
+    if(!canvas_size.width_height && !canvas_size.width && version)
+    {
+      let v_arr = version.split('.');
+
+      if(browser === 'Chrome'){
+        canvas_size = +v_arr[0] >= 73 ? canvas_size['73+'] : canvas_size['73-'];
+      } else if(browser === 'Edge'){
+        canvas_size = +v_arr[0] >= 80 ? canvas_size['80+'] : canvas_size['13'];
+      } else if(browser === 'Android'){
+        if(+v_arr[0] >= 91)
+        {
+          if(canvas_size[91][+v_arr[1]])
+          {
+            canvas_size = canvas_size[91][+v_arr[1]];
+          }
+          else if(+v_arr[1] >= 8)
+          {
+            canvas_size = canvas_size[91]['8+'];
+          }
+          else
+          {
+            canvas_size = max_canvas_sizes.Android.other;
+          }
+        }
+        else if(+v_arr[0] >= 68)
+        {
+          if(canvas_size[68][+v_arr[1]])
+          {
+            canvas_size = canvas_size[91][+v_arr[1]];
+          }
+          else if(+v_arr[1] >= 7)
+          {
+            canvas_size = canvas_size[68]['7+'];
+          }
+          else
+          {
+            canvas_size = max_canvas_sizes.Android.other;
+          }
+        }
+        else
+        {
+          canvas_size = max_canvas_sizes.Android.other;
+        }
+      }
+    }
+    else if(!canvas_size.width_height && !canvas_size.width)
+    {
+      canvas_size = canvas_size_other;
+    }
+
+    if(!canvas_size.width && canvas_size.width_height)
+    {
+      canvas_size.width = canvas_size.width_height;
+      canvas_size.height = canvas_size.width_height;
+    }
+
+    if(!canvas_size.area)
+    {
+      canvas_size.area = canvas_size.width * canvas_size.height;
+    }
+
+    this.max_canvas_size = canvas_size;
+    this.max_canvas_size.browser = browser;
+    this.max_canvas_size.version = version;
   }
 
   muck(txt)
@@ -747,7 +923,19 @@ class Websafe
           let tallest = 0;
           let padding_top = 0;
           let margin_top = 0;
+          let margin_left = _this.options.margin;
           let new_top = p.top;
+          let new_left = p.left;
+
+          if(p.left === 0)//first item in row
+          {
+            margin_left = Math.floor((Math.random() * _this.options.font_size * 3) + _this.options.font_size);
+            new_left = p.left + margin_left;
+
+            $color.css({
+              outline: '1px solid #F00'
+            });
+          }
 
           if(p.top === 0) //first row
           {
@@ -757,8 +945,8 @@ class Websafe
           }
           else
           {
-            let x_left = Math.floor(p.left + _this.options.margin + 2);
-            let x_right = Math.floor(p.left + _this.options.margin) + Math.floor($color[0].clientWidth) - 4;
+            let x_left = Math.floor(p.left + margin_left + 2);
+            let x_right = Math.floor(p.left + margin_left) + Math.floor($color[0].clientWidth) - 4;
 
             //this is for calcing the top/padding-top of items based on the row above them
             for(let x = x_left; x < x_right; x++)
@@ -782,6 +970,7 @@ class Websafe
           {
             p = $color.css({
               'margin-top': margin_top + 'px',
+              'margin-left': margin_left + 'px',
               'padding-top': padding_top + 'px'
             }).position();
 
@@ -795,6 +984,7 @@ class Websafe
             })
 
             p.top = new_top;
+            p.left = new_left;
           }
 
           let ret = {
@@ -804,7 +994,6 @@ class Websafe
             margin_top: margin_top,
             width: Math.floor($color[0].clientWidth),
             height: Math.floor($color[0].clientHeight),
-            //h2: $color.height(),
             left: Math.floor(p.left),
             top: Math.floor(p.top),
             font_size: font_size
@@ -899,16 +1088,29 @@ class Websafe
 
               if(current.resize)
               {
-                //console.log('RESIZE', current)
+
                 let txt_len = current.txt.length + (next ? next.txt.length : 0);
                 let new_width_perc = current.txt.length / txt_len;
                 let new_width = Math.floor(current.width * new_width_perc);
 
+                //console.log('RESIZE', current, txt_len, current.txt + next.txt, new_width_perc, new_width);
+
                 current = make_color(loops, {
                   total_width: new_width,
-                  //border: '1px solid #000',
+                  //border: '1px solid #00F',
                   type: 'last resize'
                 });
+
+                //console.log('RESIZED', current);
+
+                if(next)
+                {
+                  next = make_color(loops + 1, {
+                    total_width: current.width - new_width,
+                    //border: '1px solid #0F0',
+                    type: 'last resize'
+                  });
+                }
               }
             }
             else //not last item
@@ -939,7 +1141,7 @@ class Websafe
 
           loops++;
         }
-      }, 30);
+      }, 50);
     }
     else
     {
@@ -1235,15 +1437,33 @@ class Websafe
       return false;
     }
 
-    let is_valid_size = canvasSize.test({
-      width : width,
-      height: height
-    });
+    let is_valid_size = true;
+    let errors = [];
+    if(width > this.max_canvas_size.width)
+    {
+      errors.push('too wide, max width for your browser is ' + this.max_canvas_size.width + 'px, and your canvas is ' + width + 'px')
+      is_valid_size = false;
+    }
+
+    if(height > this.max_canvas_size.height)
+    {
+      errors.push('too tall, max width for your browser is ' + this.max_canvas_size.height + 'px, and your canvas is ' + height + 'px')
+      is_valid_size = false;
+    }
+
+    if(width * height > this.max_canvas_size.area)
+    {
+      errors.push('too large, max area for your browser is ' + this.max_canvas_size.area + 'px, and your canvas is ' + (width * height) + 'px')
+      is_valid_size = false;
+    }
 
     if(!is_valid_size) //because browsers all have different max canvas sizes because why not
     {
-      alert('Your canvas is too large. Try making the "Size Multiplier" setting smaller.');
-      return false;
+      console.log(this.max_canvas_size);
+      if(!confirm('Your canvas is: ' + errors.join(', ') + '. Try adjusting some of the settings to fix the issue, or try anyway? (Your browser may freeze.)'))
+      {
+        return false;
+      }
     }
 
     context.imageSmoothingEnabled = true;
@@ -1276,7 +1496,8 @@ class Websafe
             h = elem.clientHeight * options.multiplier,
             p = $(elem).position(),
             margin_top = (elem.style['margin-top'] ? +elem.style['margin-top'].replace('px', '') : 0) * options.multiplier,
-            tx = ((p.left + _this.options.margin) * options.multiplier) + canvas_margin.left,
+            margin_left = (elem.style['margin-left'] ? +elem.style['margin-left'].replace('px', '') : 0) * options.multiplier,
+            tx = (p.left * options.multiplier) + margin_left + canvas_margin.left,
             ty = (p.top * options.multiplier) + margin_top + canvas_margin.top;
 
 

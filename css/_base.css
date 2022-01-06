@@ -79,13 +79,17 @@ body input {
   padding: .5rem;
 }
 
-body input:hover {
+body input:not([disabled]):hover {
   border: 1px solid var(--color-fuchsia);
 }
 
-body input:focus {
+body input:not([disabled]):focus {
   outline: none;
   border: 1px solid var(--color-orange);
+}
+
+body input[disabled] {
+  opacity: .5;
 }
 
 body input[type="checkbox"] {
@@ -134,10 +138,30 @@ body select {
   background-position: right 20px center, right bottom, right bottom, right bottom;
 }
 
-body select:hover {
+body select:not([disabled]):hover {
   border: 1px solid var(--color-fuchsia);
   background-image: linear-gradient(var(--color-black), var(--color-black)), linear-gradient(-135deg, transparent 50%, var(--color-black) 50%), linear-gradient(-225deg, transparent 50%, var(--color-black) 50%), linear-gradient(var(--color-black) 42%, var(--color-orange) 42%);
   cursor: pointer;
+}
+
+body select[disabled] {
+  opacity: .5;
+}
+
+body label {
+  white-space: nowrap;
+  color: var(--color-lightgray);
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+body label[disabled] {
+  opacity: .5;
+}
+
+body label[disabled] > input[disabled],
+body label[disabled] > select[disabled] {
+  opacity: 1;
 }
 
 body button {
@@ -148,25 +172,23 @@ body button {
   padding: .5rem;
 }
 
-body button:hover {
+body button:not([disabled]):hover {
   border: 1px solid var(--color-yellow);
 }
 
-body button:active {
+body button:not([disabled]):active {
   outline: none;
   background: var(--color-yellow);
   border: 1px solid var(--color-yellow);
 }
 
-body button:focus {
+body button:not([disabled]):focus {
   outline: none;
   border: 1px solid var(--color-white);
 }
 
-body label {
-  color: var(--color-lightgray);
-  font-size: 1rem;
-  line-height: 1rem;
+body button[disabled] {
+  opacity: .5;
 }
 
 body .switch {

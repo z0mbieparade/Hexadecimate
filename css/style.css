@@ -79,13 +79,17 @@ body input {
   padding: .5rem;
 }
 
-body input:hover {
+body input:not([disabled]):hover {
   border: 1px solid var(--color-fuchsia);
 }
 
-body input:focus {
+body input:not([disabled]):focus {
   outline: none;
   border: 1px solid var(--color-orange);
+}
+
+body input[disabled] {
+  opacity: .5;
 }
 
 body input[type="checkbox"] {
@@ -134,10 +138,30 @@ body select {
   background-position: right 20px center, right bottom, right bottom, right bottom;
 }
 
-body select:hover {
+body select:not([disabled]):hover {
   border: 1px solid var(--color-fuchsia);
   background-image: linear-gradient(var(--color-black), var(--color-black)), linear-gradient(-135deg, transparent 50%, var(--color-black) 50%), linear-gradient(-225deg, transparent 50%, var(--color-black) 50%), linear-gradient(var(--color-black) 42%, var(--color-orange) 42%);
   cursor: pointer;
+}
+
+body select[disabled] {
+  opacity: .5;
+}
+
+body label {
+  white-space: nowrap;
+  color: var(--color-lightgray);
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+body label[disabled] {
+  opacity: .5;
+}
+
+body label[disabled] > input[disabled],
+body label[disabled] > select[disabled] {
+  opacity: 1;
 }
 
 body button {
@@ -148,25 +172,23 @@ body button {
   padding: .5rem;
 }
 
-body button:hover {
+body button:not([disabled]):hover {
   border: 1px solid var(--color-yellow);
 }
 
-body button:active {
+body button:not([disabled]):active {
   outline: none;
   background: var(--color-yellow);
   border: 1px solid var(--color-yellow);
 }
 
-body button:focus {
+body button:not([disabled]):focus {
   outline: none;
   border: 1px solid var(--color-white);
 }
 
-body label {
-  color: var(--color-lightgray);
-  font-size: 1rem;
-  line-height: 1rem;
+body button[disabled] {
+  opacity: .5;
 }
 
 body .switch {
@@ -900,7 +922,7 @@ body .switch input[disabled] + .slider:before {
 
 @font-face {
   font-family: 'November';
-  src: url("November.ttf.woff") format("woff"), url("November.ttf.svg#November") format("svg"), url("November.ttf.eot"), url("November.ttf.eot?#iefix") format("embedded-opentype");
+  src: url("November.woff") format("woff"), url("November.svg#November") format("svg"), url("November.eot"), url("November.eot?#iefix") format("embedded-opentype");
   font-weight: normal;
   font-style: normal;
 }
@@ -910,12 +932,17 @@ body {
   padding: .5rem;
 }
 
-body label {
-  white-space: nowrap;
+body #settings, body #preview_canvas, body #inputs {
+  margin-bottom: 1rem;
 }
 
-body #settings, body #preview_canvas {
-  margin-bottom: 1rem;
+body #settings #inputs label {
+  display: inline-block;
+  padding: 2px;
+}
+
+body #settings #inputs label input:not([type=checkbox]) {
+  width: 3rem;
 }
 
 body #title {
@@ -931,10 +958,24 @@ body #title * {
   line-height: 1.5rem;
 }
 
+body #preview_canvas {
+  display: flex;
+  border: 1px dashed var(--color-purple);
+  width: 100%;
+  overflow: hidden;
+}
+
+body #preview_canvas canvas {
+  flex: 0 1 auto;
+  object-fit: contain;
+  object-position: top left;
+  max-width: 100%;
+}
+
 body #sizer {
   font-family: 'November', monospace !important;
   text-transform: uppercase;
-  background: #000;
+  border: 1px dashed var(--color-purple);
   width: max-content;
   position: relative;
 }
@@ -1046,7 +1087,7 @@ body .switch.inside_label#asc_desc_switch .slider:before {
   height: 15px;
   width: 15px;
   left: 4px;
-  bottom: 3px;
+  bottom: 5px;
   background-color: var(--color-purple);
   box-shadow: none;
 }
@@ -1056,7 +1097,7 @@ body .switch.inside_label#asc_desc_switch .slider:after {
   position: absolute;
   color: var(--color-fuchsia);
   right: 8px;
-  bottom: 2px;
+  bottom: 4px;
 }
 
 body .switch.inside_label#asc_desc_switch input:checked + .slider {

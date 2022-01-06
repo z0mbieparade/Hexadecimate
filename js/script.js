@@ -1,103 +1,188 @@
 var ws = new Websafe();
-var default_settings = {
-  cols: 0,
-  labels: 'names',
-  muck: 1,
-  font_size: 15,
-  letter_spacing: true,
-  masonry: true,
-  padding: 4,
-  margin: 0,
-  border_style: 'solid',
-  border_width: 3,
-  shadow: true,
-  shadow_blur: 5,
-  shadow_x: 0,
-  shadow_y: 5,
-  sort_by: 'hue',
-  asc_desc: false,
-  multiplier: 10
-}
-
-var get_options = function(override)
-{
-  return {...{
-    cols: +$('#cols').val(),
-    labels: $('#labels').val(),
-    muck: +$('#muck').val(),
-    font_size: +$('#font_size').val(),
-    letter_spacing: $('#letter_spacing').prop('checked') ? true : false,
-    padding: +$('#padding').val(),
-    margin: +$('#margin').val(),
-    border_style: $('#border_style').val(),
-    border_width: +$('#border_width').val(),
-    shadow: $('#shadow').prop('checked') ? true : false,
-    shadow_blur: +$('#shadow_blur').val(),
-    shadow_x: +$('#shadow_x').val(),
-    shadow_y: +$('#shadow_y').val(),
-    masonry: $('#masonry').prop('checked') ? true : false,
-    sort_by: $('#sort_by').val(),
-    asc_desc: $('#asc_desc').prop('checked') ? true : false,
-    multiplier: +$('#multiplier').val(),
-    //max_colors: 10 //to limit colors for testing
-  }, ...override};
-}
-
-var rand_options = function(override)
-{
-  let new_settings = {
-    cols: Math.round(Math.random() * 6),
-    labels: ['names', 'hex', 'short_hex', 'sherwin_ai'][Math.round(Math.random() * 3)],
-    muck: Math.round(Math.random() * 5),
-    font_size: Math.round((Math.random() * 35) + 12),
-    letter_spacing: Math.round(Math.random() * 1) ? true : false,
-    padding: Math.round((Math.random() * 10) + 4),
-    margin: Math.round(Math.random() * 10),
-    border_style: ['none', 'solid', 'dotted', 'dashed'][Math.round(Math.random() * 3)],
-    border_width: Math.round(Math.random() * 5),
-    shadow: Math.round(Math.random() * 1) ? true : false,
-    shadow_blur: Math.round(Math.random() * 15),
-    shadow_x: Math.round(Math.random() * 15),
-    shadow_y: Math.round(Math.random() * 15),
-    masonry: Math.round(Math.random() * 1) ? true : false,
-    sort_by: ['hue','saturation','value','red','green','blue','luminance','alphanumeric'][Math.round(Math.random() * 7)],
-    asc_desc: Math.round(Math.random() * 1) ? true : false
-  };
-
-  for(let key in new_settings)
-  {
-    if($('#' + key).attr('type') === 'checkbox')
+var settings = new Settings({
+  masonry: {
+    label: 'Masonry',
+    type: 'bool',
+    default: true,
+  },
+  cols: {
+    label: 'Columns',
+    type: 'int',
+    default: 5,
+    max: 15,
+    min: 0
+  },
+  labels: {
+    label: 'Labels',
+    type: 'enum',
+    values: [
+      {val: 'names', txt: 'Browser Colors (black)'},
+      {val: 'hex', txt: 'Hex Codes (#000000)'},
+      {val: 'short_hex', txt: 'Short Hex Codes (#000)'},
+      {val: 'sherwin_ai', txt: 'AI Generated Names (Dorkwood)'}
+    ],
+    default: 'names',
+    on_change: function(val)
     {
-      $('#' + key).prop('checked', new_settings[key] ? true : false);
+      if(val === 'hex' || val === 'short_hex')
+      {
+        settings.disable('muck');
+      }
+      else
+      {
+        settings.enable('muck');
+      }
     }
-    else
+  },
+  muck: {
+    label: 'Muck',
+    type: 'int',
+    default: 1,
+    min: 0,
+    max: 10
+  },
+  font_size: {
+    label: 'Font Size',
+    type: 'int',
+    default: 15,
+    min: 5,
+    max: 50
+  },
+  letter_spacing: {
+    label: 'Letter Spacing',
+    type: 'bool',
+    default: true,
+  },
+  padding: {
+    label: 'Padding',
+    type: 'int',
+    default: 4,
+    min: 0,
+    max: 20
+  },
+  margin: {
+    label: 'Margin',
+    type: 'int',
+    default: 3,
+    min: 0,
+    max: 20
+  },
+  border_style: {
+    label: 'Border',
+    type: 'enum',
+    values: [
+      {val: 'none', txt: 'None'},
+      {val: 'solid', txt: 'Solid'},
+      {val: 'dotted', txt: 'Dotted'},
+      {val: 'dashed', txt: 'Dashed'}
+    ],
+    default: 'dashed',
+    on_change: function(val)
     {
-      $('#' + key).val(new_settings[key]);
+      if(val === 'none')
+      {
+        settings.disable('border_width');
+      }
+      else
+      {
+        settings.enable('border_width');
+      }
     }
+  },
+  border_width: {
+    label: 'Border Width',
+    type: 'int',
+    default: 1,
+    min: 0,
+    max: 10
+  },
+  shadow: {
+    label: 'Shadow',
+    type: 'bool',
+    default: false,
+    on_change: function(val)
+    {
+      if(val)
+      {
+        settings.enable('shadow_blur');
+        settings.enable('shadow_x');
+        settings.enable('shadow_y');
+      }
+      else
+      {
+        settings.disable('shadow_blur');
+        settings.disable('shadow_x');
+        settings.disable('shadow_y');
+      }
+    }
+  },
+  shadow_blur: {
+    label: 'Shadow Blur',
+    type: 'int',
+    default: 5,
+    min: 0,
+    max: 30
+  },
+  shadow_x: {
+    label: 'Shadow X',
+    type: 'int',
+    default: 5,
+    min: -40,
+    max: 40
+  },
+  shadow_y: {
+    label: 'Shadow Y',
+    type: 'int',
+    default: 0,
+    min: -40,
+    max: 40
+  },
+  sort_by: {
+    label: 'Sort By',
+    type: 'enum',
+    values: [
+      {val: 'hue', txt: 'Hue'},
+      {val: 'saturation', txt: 'Saturation'},
+      {val: 'value', txt: 'Value'},
+      {val: 'red', txt: 'Red'},
+      {val: 'green', txt: 'Green'},
+      {val: 'blue', txt: 'Blue'},
+      {val: 'luminance', txt: 'Luminance'},
+      {val: 'alphanumeric', txt: 'Alphanumeric'}
+    ],
+    default: 'hue'
+  },
+  asc_desc: {
+    type: 'bool',
+    ui_type: 'switch',
+    ui_subtype: 'inside_label',
+    default: false
+  },
+  multiplier: {
+    label: 'Size Multiplier',
+    type: 'int',
+    default: 10,
+    min: 0,
+    max: 10,
+    skip_random: true
   }
+}, {
+  app_name: 'Hexadecimate',
+  local_storage: true
+});
 
-  console.log('Randomize', JSON.stringify(new_settings));
-
-  return {...new_settings, ...override};
-}
+let set = {};
 
 $(document).ready(function()
 {
-  for(let key in default_settings){
-    if($('#' + key).attr('type') === 'checkbox')
-    {
-      $('#' + key).prop('checked', default_settings[key] ? true : false);
-    }
-    else
-    {
-      $('#' + key).val(default_settings[key]);
-    }
-  }
+  settings.build_settings($('#settings #inputs'), set);
 
   $('#preview').on('click', function(){
     $('#preview_canvas').empty();
     $('#sizer').removeClass('hide_sizer');
-    ws.set_options(get_options({multiplier: 1}), function(canvas){
+    let s = settings.get_settings({multiplier: 1});
+    console.log(s);
+    ws.set_options(s, function(canvas){
       $('#preview_canvas').empty().append(canvas);
       $('#sizer').addClass('hide_sizer');
     });
@@ -106,7 +191,9 @@ $(document).ready(function()
   $('#random').on('click', function(){
     $('#preview_canvas').empty();
     $('#sizer').removeClass('hide_sizer');
-    ws.set_options(rand_options({multiplier: 1}), function(canvas){
+    let s = settings.rand_settings({multiplier: 1});
+    console.log(JSON.stringify(s));
+    ws.set_options(s, function(canvas){
       $('#preview_canvas').empty().append(canvas);
       $('#sizer').addClass('hide_sizer');
     });
@@ -115,11 +202,22 @@ $(document).ready(function()
   $('#download').on('click', function(){
     ws.generate_image(function(canvas){
       ws.download("websafe.png", canvas.toDataURL("image/png"));
-    }, {multiplier: +$('#multiplier').val()});
+    }, {multiplier: settings.settings.multiplier.value});
+  })
+
+  $('#reset').on('click', function(){
+    $('#preview_canvas').empty();
+    $('#sizer').removeClass('hide_sizer');
+    settings.reset_to_default();
+    let s = settings.get_settings({multiplier: 1});
+    ws.set_options(s, function(canvas){
+      $('#preview_canvas').empty().append(canvas);
+      $('#sizer').addClass('hide_sizer');
+    });
   })
 
   setTimeout(function()
   {
-    $('#random').click();
+    $('#preview').click();
   }, 100);
 });
