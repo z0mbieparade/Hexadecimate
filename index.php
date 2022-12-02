@@ -48,7 +48,7 @@ $settings = $set;
 		console.log('You have not created your settings.php file, please copy settings_default.php to settings.php and update it with correct settings.');
 	<?php }?>
 </script>
-<div id="title" class="fg14">Hexadecimate - generate various browser safe/hex color combos. <a href="z0m.bi" class="fg03" target="_blank">z0m.bi</a></div>
+<div id="title" class="fg14">Hexadecimate - generate various browser safe/hex color combos. <a href="https://z0m.bi" class="fg03" target="_blank">z0m.bi</a></div>
 <div id="settings">
 	<div id="inputs"></div>
 	<button id="preview">Preview</button>
